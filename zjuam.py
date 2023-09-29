@@ -28,10 +28,10 @@ class ZJULogin:
             j = r2.json()#公钥（模数和指数）在返回的json中
             modulus = j['modulus']#模数
             exponent = j['exponent']#指数
-            return [self.transform_rsa(self.password, modulus, exponent), self.find_execution(r1)]#返回post所需要的所有数据
+            return [self.transform_rsa(self.密码, modulus, exponent), self.find_execution(r1)]#返回post所需要的所有数据
 
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"网络请求失败: {e}")
+            self.logger.error(f"网站提取信息失败: {e}")
             return None
 
     def transform_rsa(self, m, N, e):#密码的RSA加密
@@ -73,23 +73,18 @@ class ZJULogin:
 
     def login(self, user_id, password):
         self.user_id = user_id
-        self.password = password
-        list1 = self.get_key()
-        if list1:
-            p = list1[0]#加密后密码
-            execution = list1[1]#execution的值
-            r3 = self.post(self.user_id, p, execution)
-            if r3:
-                return r3
-            else:
-                self.logger.error("登录失败")
-                return None
-        else:
-            self.logger.error("登录失败")
+        self.密码 = password
+        if 'zju.edu.cn' not in url_login:
+            print("网址输入错误")
             return None
+        list1 = self.get_key()
+        p = list1[0]#加密后密码
+        execution = list1[1]#execution的值
+        r3 = self.post(self.user_id, p, execution)
+        return r3
 
 
-url_login = 'https://zjuam.zju.edu.cn/cas/login'#登录网址
+url_login = input('请输入您要登录的网址：')#登录网址
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Core/1.94.202.400 QQBrowser/11.9.5355.400'
 }
